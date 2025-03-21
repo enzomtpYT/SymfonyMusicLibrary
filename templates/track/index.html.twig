@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Track index{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 mb-5">
+        <div class="row align-items-center mb-2">
+            <div class="col">
+                <h1>Track index</h1>
+            </div>
+
+            {% if is_granted('ROLE_USER')  %}
+                <div class="col-auto">
+                    <a class="btn btn-danger rounded-pill" href="{{ path('app_track_new') }}">
+                        <i class="fa-solid fa-plus"></i>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="table-responsive border rounded">
+            <table class="table table-hover table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Title</th>
+                        <th>Artist</th>
+                        <th>Featuring</th>
+                        <th>Duration</th>
+                        <th>actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for track in tracks %}
+                    <tr>
+                        <td>{{ track.id }}</td>
+                        <td>{{ track.title }}</td>
+                        <td>{{ track.album.artist }}</td>
+                        <td>{{ track.featuring|join(', ') }}</td>
+                        <td>{{ track.readableDuration }}</td>
+                        <td>
+                            <a href="{{ path('app_track_show', {'id': track.id}) }}">show</a>
+                            {% if is_granted('ROLE_ADMIN')  %}
+                                <a href="{{ path('app_track_edit', {'id': track.id}) }}">edit</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">no records found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

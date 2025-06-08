@@ -3,23 +3,11 @@
 {% block title %}Edit Track{% endblock %}
 
 {% block body %}
-    <div class="container mt-5 mb-5">
-        <div class="row mb-2 align-items-center">
-            <div class="col-auto">
-                <a class="btn btn-danger rounded-pill" href="{{ path('app_track_index') }}">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-            </div>
+    <h1>Edit Track</h1>
 
-            <div class="col">
-                <h1>Edit Track</h1>
-            </div>
+    {{ include('track/_form.html.twig', {'button_label': 'Update'}) }}
 
-            <div class="col-auto">
-                {{ include('track/_delete_form.html.twig') }}
-            </div>
-        </div>
+    <a href="{{ path('app_track_index') }}">back to list</a>
 
-        {{ include('track/_form.html.twig', {'button_label': 'Update'}) }}
-    </div>
+    {{ include('track/_delete_form.html.twig') }}
 {% endblock %}

@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/track')]
 class TrackController extends AbstractController
@@ -24,11 +24,8 @@ class TrackController extends AbstractController
     }
 
     #[Route('/new', name: 'app_track_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_USER')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
-
         $track = new Track();
         $form = $this->createForm(TrackType::class, $track);
         $form->handleRequest($request);
@@ -55,11 +52,8 @@ class TrackController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_track_edit', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Track $track, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
-
         $form = $this->createForm(TrackType::class, $track);
         $form->handleRequest($request);
 
@@ -76,11 +70,8 @@ class TrackController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_track_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Track $track, EntityManagerInterface $entityManager): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED');
-        
         if ($this->isCsrfTokenValid('delete'.$track->getId(), $request->request->get('_token'))) {
             $entityManager->remove($track);
             $entityManager->flush();
@@ -88,4 +79,26 @@ class TrackController extends AbstractController
 
         return $this->redirectToRoute('app_track_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/{id}/toggle-favorite', name: 'track_toggle_favorite', methods: ['POST'])]
+    public function toggleFavorite(Track $track, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['success' => false], 403);
+        }
+
+        if ($user->getFavoriteTracks()->contains($track)) {
+            $user->removeFavoriteTrack($track);
+            $favorite = false;
+        } else {
+            $user->addFavoriteTrack($track);
+            $favorite = true;
+        }
+        $em->flush();
+
+        return new JsonResponse(['success' => true, 'favorite' => $favorite]);
+    }
+
+
 }

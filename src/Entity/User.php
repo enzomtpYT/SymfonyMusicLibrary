@@ -7,8 +7,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Artiste;
+use App\Entity\Release;
+use App\Entity\Track;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -17,9 +23,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 180)]
     private ?string $email = null;
 
+    /**
+     * @var list<string> The user roles
+     */
     #[ORM\Column]
     private array $roles = [];
 
@@ -29,11 +38,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 30)]
-    private ?string $firstname = null;
+    #[ORM\ManyToMany(targetEntity: Artiste::class)]
+    private Collection $favoriteArtistes;
 
-    #[ORM\Column(length: 30)]
-    private ?string $name = null;
+    #[ORM\ManyToMany(targetEntity: Release::class)]
+    private Collection $favoriteReleases;
+
+    #[ORM\ManyToMany(targetEntity: Track::class)]
+    private Collection $favoriteTracks;
+
+    public function __construct()
+    {
+        $this->favoriteArtistes = new ArrayCollection();
+        $this->favoriteReleases = new ArrayCollection();
+        $this->favoriteTracks = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -74,6 +93,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
+    /**
+     * @param list<string> $roles
+     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -84,7 +106,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see PasswordAuthenticatedUserInterface
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -105,26 +127,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getFirstname(): ?string
+    public function getFavoriteArtistes(): Collection
     {
-        return $this->firstname;
+        return $this->favoriteArtistes;
     }
 
-    public function setFirstname(string $firstname): static
+    public function addFavoriteArtiste(Artiste $artiste): self
     {
-        $this->firstname = $firstname;
+        if (!$this->favoriteArtistes->contains($artiste)) {
+            $this->favoriteArtistes[] = $artiste;
+        }
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function removeFavoriteArtiste(Artiste $artiste): self
     {
-        return $this->name;
+        $this->favoriteArtistes->removeElement($artiste);
+
+        return $this;
     }
 
-    public function setName(string $name): static
+    public function getFavoriteReleases(): Collection
     {
-        $this->name = $name;
+        return $this->favoriteReleases;
+    }
+
+    public function addFavoriteRelease(Release $release): self
+    {
+        if (!$this->favoriteReleases->contains($release)) {
+            $this->favoriteReleases[] = $release;
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteRelease(Release $release): self
+    {
+        $this->favoriteReleases->removeElement($release);
+
+        return $this;
+    }
+
+    public function getFavoriteTracks(): Collection
+    {
+        return $this->favoriteTracks;
+    }
+
+    public function addFavoriteTrack(Track $track): self
+    {
+        if (!$this->favoriteTracks->contains($track)) {
+            $this->favoriteTracks[] = $track;
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteTrack(Track $track): self
+    {
+        $this->favoriteTracks->removeElement($track);
 
         return $this;
     }

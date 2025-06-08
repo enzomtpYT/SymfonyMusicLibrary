@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\TrackRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TrackRepository::class)]
@@ -16,41 +14,31 @@ class Track
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    private ?string $name = null;
 
     #[ORM\Column]
     private ?int $duration = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $thumbnailURL = null;
+
     #[ORM\ManyToOne(inversedBy: 'tracks')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Album $album = null;
-
-    #[ORM\ManyToMany(targetEntity: Artist::class, inversedBy: 'featurings')]
-    private Collection $featuring;
-
-    public function __construct()
-    {
-        $this->featuring = new ArrayCollection();
-    }
-
-    public function __toString()
-    {
-        return $this->title;
-    }
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')] 
+    private ?Release $album = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getName(): ?string
     {
-        return $this->title;
+        return $this->name;
     }
 
-    public function setTitle(string $title): static
+    public function setName(string $name): static
     {
-        $this->title = $title;
+        $this->name = $name;
 
         return $this;
     }
@@ -60,17 +48,6 @@ class Track
         return $this->duration;
     }
 
-    public function getReadableDuration(): string
-    {
-        $duration = $this->getDuration();
-        $moreThanOneHour = $duration >= (60 * 60);
-
-        return gmdate(
-            $moreThanOneHour ? 'G:i:s' : 'i:s',
-            $duration
-        );
-    }
-
     public function setDuration(int $duration): static
     {
         $this->duration = $duration;
@@ -78,39 +55,28 @@ class Track
         return $this;
     }
 
-    public function getAlbum(): ?Album
+    public function getThumbnailURL(): ?string
+    {
+        return $this->thumbnailURL;
+    }
+
+    public function setThumbnailURL(?string $thumbnailURL): static
+    {
+        $this->thumbnailURL = $thumbnailURL;
+
+        return $this;
+    }
+
+    public function getAlbum(): ?Release
     {
         return $this->album;
     }
 
-    public function setAlbum(?Album $album): static
+    public function setAlbum(?Release $album): static
     {
         $this->album = $album;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Artist>
-     */
-    public function getFeaturing(): Collection
-    {
-        return $this->featuring;
-    }
-
-    public function addFeaturing(Artist $featuring): static
-    {
-        if (!$this->featuring->contains($featuring)) {
-            $this->featuring->add($featuring);
-        }
-
-        return $this;
-    }
-
-    public function removeFeaturing(Artist $featuring): static
-    {
-        $this->featuring->removeElement($featuring);
-
-        return $this;
-    }
 }

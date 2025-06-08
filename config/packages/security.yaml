@@ -16,17 +16,19 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                username_parameter: login[email]
-                password_parameter: login[password]
-                default_target_path: app_home
-
+            custom_authenticator: App\Security\UserAuthenticator
             logout:
                 path: app_logout
-                target: app_home
+                # where to redirect after logout
+                # target: app_any_route
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                # by default, the feature is enabled by checking a checkbox in the
+                # login form, uncomment the following line to always enable it.
+                #always_remember_me: true
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -37,12 +39,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/user, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: ROLE_USER }
-
-    role_hierarchy:
-        ROLE_ADMIN: ROLE_USER
-        ROLE_SUPER_ADMIN: ROLE_ADMIN
+        - { path: ^/signup, roles: PUBLIC_ACCESS }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:

@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Favoris{% endblock %}
+
+{% block body %}
+    <h1 class="text-center my-4">Mes Favoris</h1>
+    <style>
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            background-color: #f8f9fa;
+        }
+    </style>
+
+    <section>
+        <h2>Artistes favoris</h2>
+        <div class="row">
+            {% for artist in favorite_artists %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ artist.thumbnailURL ?: asset('images/default-thumbnail.png') }}" class="card-img-top" alt="Image de {{ artist.nom }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">{{ artist.nom }}</h5>
+                                <span 
+                                    class="favorite-toggle favorite-toggle-artist ms-auto"
+                                    data-id="{{ artist.id }}"
+                                    data-type="artist"
+                                    style="cursor: pointer; font-size: 1.5rem; color: red;">
+                                    ❤️
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">Aucun artiste favori.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section>
+        <h2>Albums favoris</h2>
+        <div class="row">
+            {% for album in favorite_albums %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ album.thumbnailURL ?: asset('images/default-thumbnail.jpg') }}" class="card-img-top" alt="Image de {{ album.name }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">{{ album.name }}</h5>
+                                <span 
+                                    class="favorite-toggle favorite-toggle-album ms-auto"
+                                    data-id="{{ album.id }}"
+                                    data-type="album"
+                                    style="cursor: pointer; font-size: 1.5rem; color: red;">
+                                    ❤️
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">Aucun album favori.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section>
+        <h2>Pistes favorites</h2>
+        <div class="row">
+            {% for track in favorite_tracks %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ track.thumbnailURL ?: asset('images/default-thumbnail.jpg') }}" class="card-img-top" alt="Image de {{ track.name }}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">{{ track.name }}</h5>
+                                <span 
+                                    class="favorite-toggle favorite-toggle-track ms-auto"
+                                    data-id="{{ track.id }}"
+                                    data-type="track"
+                                    style="cursor: pointer; font-size: 1.5rem; color: red;">
+                                    ❤️
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">Aucune piste favorite.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.favorite-toggle').forEach(function(element) {
+            element.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const type = this.getAttribute('data-type');
+                let url = '';
+
+                if (type === 'artist') url = `/artiste/${id}/toggle-favorite`;
+                if (type === 'album') url = `/release/${id}/toggle-favorite`;
+                if (type === 'track') url = `/track/${id}/toggle-favorite`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.style.color = data.favorite ? 'red' : 'gray';
+                        this.innerHTML = data.favorite ? '❤️' : '🤍';
+                        if (!data.favorite) {
+                            location.reload();
+                        }
+                    }
+                });
+            });
+        });
+    });
+    </script>
+    
+{% endblock %}

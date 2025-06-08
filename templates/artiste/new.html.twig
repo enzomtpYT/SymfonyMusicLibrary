@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvel Artiste{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Créer un nouvel artiste</h1>
+
+        <div class="card shadow-sm p-4 mx-auto" style="max-width: 500px;"> <!-- Carte plus petite -->
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'onsubmit': 'return confirmSubmit()'}}) }}
+                <div class="mb-3">
+                    {{ form_label(form.Nom, 'Nom de l\'artiste', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.Nom, {'attr': {'class': 'form-control form-control-sm', 'placeholder': 'Entrez le nom de l\'artiste'}}) }} 
+                    {{ form_errors(form.Nom) }}
+                </div>
+
+                
+
+                <div class="mb-3">
+                    {{ form_label(form.thumbnailURL, 'URL d\'image l\'artiste (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.thumbnailURL, {'attr': {'class': 'form-control form-control-sm', 'placeholder': 'Entrez l\'URL de l\'artiste'}}) }} 
+                    {{ form_errors(form.thumbnailURL) }}
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                    <a href="{{ path('app_artiste_index') }}" class="btn btn-secondary btn-sm">Retour à la liste</a> 
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <script>
+        // Validation Bootstrap
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+
+        // Confirmation avant soumission
+        function confirmSubmit() {
+            return confirm('Êtes-vous sûr de vouloir enregistrer cet artiste ?');
+        }
+    </script>
+{% endblock %}

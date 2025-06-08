@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Gestion des utilisateurs</h1>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Rôles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>
+                    {{ form_start(forms[user.id]) }}
+                    {{ form_widget(forms[user.id].email) }}
+                </td>
+                <td>
+                    {{ form_widget(forms[user.id].roles) }}
+                </td>
+                <td>
+                    <button class="btn btn-success btn-sm" type="submit">Enregistrer</button>
+                    {{ form_end(forms[user.id]) }}
+                    <form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" style="display:inline-block;" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+                        <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm mt-5">
+            <div class="card-body">
+                <h2 class="card-title mb-4 text-center">Mes informations</h2>
+                {{ form_start(accountForm) }}
+                    <div class="mb-3">
+                        {{ form_label(accountForm.email) }}
+                        {{ form_widget(accountForm.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(accountForm.email) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(accountForm.plainPassword) }}
+                        {{ form_widget(accountForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(accountForm.plainPassword) }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Enregistrer les modifications</button>
+                {{ form_end(accountForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

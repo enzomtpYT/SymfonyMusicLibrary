@@ -1,20 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Track{% endblock %}
+{% block title %}Nouvelle Piste{% endblock %}
 
 {% block body %}
-    <div class="container mt-5 mb-5">
-        <div class="row align-items-center mb-2">
-        <div class="col-auto">
-            <a class="btn btn-danger rounded-pill" href="{{ path('app_track_index') }}">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-        </div>
-        <div class="col">
-            <h1>Create new Track</h1>
-        </div>
-        </div>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Créer une nouvelle piste</h1>
 
-        {{ include('track/_form.html.twig') }}
+        <div class="card shadow-sm p-4 mx-auto" style="max-width: 500px;"> <!-- Carte plus petite -->
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'onsubmit': 'return confirmSubmit()'}}) }}
+                <div class="mb-3">
+                    {{ form_label(form.name, 'Nom de la piste', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-sm', 'placeholder': 'Entrez le nom de la piste'}}) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.duration, 'Durée (en secondes)', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.duration, {'attr': {'class': 'form-control form-control-sm', 'placeholder': 'Entrez la durée de la piste'}}) }}
+                    {{ form_errors(form.duration) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.album, 'Album', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.album, {'attr': {'class': 'form-select form-select-sm'}}) }}
+                    {{ form_errors(form.album) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.thumbnailURL, 'URL d\'image de la piste (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.thumbnailURL, {'attr': {'class': 'form-control form-control-sm', 'placeholder': 'Entrez l\'URL de la piste'}}) }}
+                    {{ form_errors(form.thumbnailURL) }}
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                    <a href="{{ path('app_track_index') }}" class="btn btn-secondary btn-sm">Retour à la liste</a>
+                </div>
+            {{ form_end(form) }}
+        </div>
     </div>
+
+    <script>
+        function confirmSubmit() {
+            return confirm('Êtes-vous sûr de vouloir enregistrer cette piste ?');
+        }
+    </script>
 {% endblock %}
